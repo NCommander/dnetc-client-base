@@ -53,6 +53,7 @@ return "@(#)$Id: lurk.cpp,v 1.68 2008/12/30 20:58:41 andreasb Exp $"; }
 
 //#define TRACE
 
+#include <ctype.h> // required for mac os x
 #include <stdio.h>
 #include <string.h>
 #include "cputypes.h"

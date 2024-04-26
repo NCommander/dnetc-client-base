@@ -528,9 +528,13 @@ add_sources() # $1=os, $2=arch, $3=custom
     fi
   #-----------------------------------------------------------------
   elif [ "$2" = "arm64" ]; then
-    if [ "$HAVE_RC5_72" = "1" ]; then
+    if [ "$HAVE_RC5_72" = "1" ]; then    
       DEFAULT_RC5_72="1"
-      TARGET_ADDASMS="$TARGET_ADDASMS rc5-72/arm64/r72-ks-scalarfusion.S"
+      if [ "$1" = "macosx" -o "$1" = "ios" ]; then
+        TARGET_ADDASMS="$TARGET_ADDASMS rc5-72/arm64/r72-ks-scalarfusion-clang.S"
+      else
+        TARGET_ADDASMS="$TARGET_ADDASMS rc5-72/arm64/r72-ks-scalarfusion.S"
+      fi
       TARGET_ADDSRCS="$TARGET_ADDSRCS $OGR_GENERAL_SRCS rc5-72/arm64/r72-ks-scalarfusion.cpp"
     fi # HAVE_RC5_72
     
@@ -1374,6 +1378,7 @@ OPTS_CLANGCC="-W -Wall -Wpointer-arith -Wcast-align \
 -fno-exceptions -fno-rtti"
 OPTS_CLANGCC_32="$OPTS_CLANGCC -DASM_X86"
 OPTS_CLANGCC_64="$OPTS_CLANGCC -DASM_AMD64"
+OPTS_CLANGCC_ARM64="$OPTS_CLANGCC"
 
 # -------------------------------------------------------------------------
 
@@ -2927,6 +2932,16 @@ case "$1" in
         TARGET_DOCFILES="docs/readme._ix"   #platform specific docfile
         TARGET_TARBALL="macosx-x86"
         add_sources "macosx" "x86"
+        ;;
+
+    *macosx-arm64)                # [ncommander] Mac OS X ARM64-bit
+        TARGET_plat="-arch arm64"
+        TARGET_CCFLAGS="$OPTS_CLANGCC_ARM64 -DIS_ACTUALLY_OSX -DHAVE_POSIX_THREADS $TARGET_plat"
+        TARGET_LIBS="-framework IOKit -framework CoreFoundation"
+        TARGET_LDFLAGS="$TARGET_plat"
+        TARGET_DOCFILES="docs/readme._ix"   #platform specific docfile
+        TARGET_TARBALL="macosx-arm64"
+        add_sources "macosx" "arm64"
         ;;
 
     *qnx4-x86)
